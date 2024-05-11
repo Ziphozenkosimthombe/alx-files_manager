@@ -1,36 +1,36 @@
 import {createClient} from 'redis';
 import { promisify } from 'util'
 
-class RedisClient{
-    constructor() {
-        this.client = createClient();
-        this.client.on('error', (err) => console.log(err));
-        this.connected = false;
-        this.client.on('connect', () => {
-            this.connected = true;
-        }); 
-    }
 
-    isAlive(){
-        return this.connected
-    }
+class RedisClient {
+  constructor() {
+    this.client = createClient();
+    this.client.on('error', (err) => console.log(err));
+    this.connected = false;
+    this.client.on('connect', () => {
+      this.connected = true;
+    });
+  }
 
-    async get(str){
-        const getAsyncFun = promisify(this.client.get).bind(this.client)
-        const value = await getAsyncFun(str);
-        return value;
-    }
+  isAlive() {
+    return this.connected;
+  }
 
-    async set(str, val, dur){
-        const setAsyncFun = promisify(this.client.set).bind(this.client)
-        await setAsyncFun(str, val, 'EX', dur)
-    }
+  async get(key) {
+    const getAsyncFunc = promisify(this.client.get).bind(this.client);
+    const value = await getAsyncFunc(key);
+    return value;
+  }
 
-    async del(str) {
-        const delAsyncFun = promisify(this.client.del).bind(thi.client)
-        await delAsyncFun(str);
-    }
+  async set(key, val, dur) {
+    const setAsyncFunc = promisify(this.client.set).bind(this.client);
+    await setAsyncFunc(key, val, 'EX', dur);
+  }
 
+  async del(key) {
+    const delAsyncFunc = promisify(this.client.del).bind(this.client);
+    await delAsyncFunc(key);
+  }
 }
 
 const redisClient = new RedisClient();
