@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import {createClient} from 'redis';
 import { promisify } from 'util'
 
