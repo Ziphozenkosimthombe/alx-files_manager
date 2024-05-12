@@ -4,31 +4,29 @@ class UsersController {
   static async postNew(req, res) {
     try {
       const { email, password } = req.body;
-
-      const existingUser = await dbClient.existingUser(email);
-      if (existingUser) {
-        return res.status(400).json({ error: 'User already exists' });
-      }
       if (!email) {
-        return res.status(400).json({ erro: 'Missing email' });
+        res.status(400).json({ error: 'Missing email' });
       }
       if (!password) {
-        return res.status(400).json({ erro: 'Missing password' });
+        res.status(400).json({ error: 'Missing password' });
+      }
+
+      const exists = await dbClient.userExists(email);
+      if (exists) {
+        res.status(400).json({ error: 'User already exists' });
       }
 
       const newUser = await dbClient.createUser(email, password);
-      await newUser.save();
-
       if (newUser) {
         res.status(201).json({
           _id: newUser._id,
           email: newUser.email,
         });
       } else {
-        res.status(400).json({ error: 'Invalid data' });
+        res.status(500).json({ error: 'Error creating user' });
       }
     } catch (err) {
-      return res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message });
     }
   }
 }

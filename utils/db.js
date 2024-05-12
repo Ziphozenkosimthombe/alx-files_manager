@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import pkg from 'mongodb';
-
-const { MongoClient } = pkg;
+import SHA1 from './utils.js';
+const { MongoClient, mongodb } = pkg;
 
 class DBClient {
   constructor() {
@@ -42,6 +42,52 @@ class DBClient {
       .collection('files')
       .countDocuments();
     return files;
+  }
+
+  async createUser(email, password) {
+    const hash = SHA1(password);
+    await this.client.connect();
+    const user = await this.client
+      .db(this.database)
+      .collection('users')
+      .insertOne({ email, password: hash });
+    return user;
+  }
+
+  async getUser(email) {
+    await this.client.connect();
+    const user = await this.client
+      .db(this.database)
+      .collection('users')
+      .findOne({ email: email });
+    if (!user) {
+      return null;
+    } else {
+      return user;
+    }
+  }
+
+  async getUserById(id) {
+    const _id = new mongodb.ObjectID(id);
+    await this.client.connect();
+    const user = await this.client
+      .db(this.database)
+      .collection('users')
+      .findOne({ _id: _id });
+    if (!user) {
+      return null;
+    } else {
+      return user;
+    }
+  }
+
+  async userExists(email) {
+    const user = await this.getUser(email);
+    if (user) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
