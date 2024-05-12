@@ -20,6 +20,7 @@ class DBClient {
         console.log(err);
       });
   }
+  
   isAlive() {
     return this.connected;
   }
