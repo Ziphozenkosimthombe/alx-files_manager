@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import pkg from 'mongodb';
-import sha1 from 'sha1';
-
+import { SHA1 } from './util.js';
 const { MongoClient } = pkg;
 
 class DBClient {
@@ -46,12 +45,12 @@ class DBClient {
   }
 
   async createUser(username, password) {
-    const hashPassword = sha1(password);
+    const hashPassword = SHA1(password);
     await this.client.connect();
     const user = await this.client
       .db(this.database)
       .collection('users')
-      .insertOne({ username, password: hashPassword });
+      .insertOne({ email, password: hashPassword });
     return user;
   }
 
