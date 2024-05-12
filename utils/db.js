@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import pkg from "mongodb";
+import pkg from 'mongodb';
 const { MongoClient } = pkg;
 
 class DBClient {
-  constructor() {
-    this.host = process.env.DB_HOST || "localhost";
+  constructor () {
+    this.host = process.env.DB_HOST || 'localhost';
     this.port = process.env.DB_PORT || 27017;
-    this.database = process.env.DB_DATABASE || "files_manager";
+    this.database = process.env.DB_DATABASE || 'files_manager';
     this.connected = false;
     this.url = `mongodb://${this.host}:${this.port}/${this.database}`;
     this.client = new MongoClient(this.url, { useUnifiedTopology: true });
@@ -20,25 +20,25 @@ class DBClient {
         console.log(err);
       });
   }
-  
-  isAlive() {
+
+  isAlive () {
     return this.connected;
   }
 
-  async nbUsers() {
+  async nbUsers () {
     await this.client.connect();
     const users = await this.client
       .db(this.database)
-      .collection("users")
+      .collection('users')
       .countDocuments();
     return users;
   }
 
-  async nbFiles() {
+  async nbFiles () {
     await this.client.connect();
     const files = await this.client
       .db(this.database)
-      .collection("files")
+      .collection('files')
       .countDocuments();
     return files;
   }

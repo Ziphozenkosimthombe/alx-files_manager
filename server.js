@@ -1,12 +1,12 @@
-import express from "express";
-import mainRoutes from "./routes/index.js";
+import express from 'express';
+import mainRoutes from './routes/index.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", mainRoutes);
+app.use('/', mainRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
