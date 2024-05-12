@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-import pkg from 'mongodb';
+import { MongoClient } from 'mongodb';
 import { SHA1 } from './utils.js';
-const { MongoClient, mongodb } = pkg;
 
 class DBClient {
   constructor () {
