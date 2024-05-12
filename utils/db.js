@@ -50,7 +50,7 @@ class DBClient {
       .db(this.database)
       .collection('users')
       .insertOne({ email, password: hash });
-    return user;
+    return user.ops[0];
   }
 
   async getUser (email) {
