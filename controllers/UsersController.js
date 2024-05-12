@@ -1,7 +1,7 @@
 import dbClient from '../utils/db.js';
 
 class UsersController {
-  static async postNew(req, res) {
+  static async postNew (req, res) {
     try {
       const { email, password } = req.body;
 
@@ -16,14 +16,15 @@ class UsersController {
         return res.status(400).json({ erro: 'Missing password' });
       }
 
-      const newUser = await dbClient.createUser(email, hashedPassword);
+      const newUser = await dbClient.createUser(email, password);
       await newUser.save();
 
       if (newUser) {
         res.status(201).json({
           _id: newUser._id,
           email: newUser.email,
-          password: newUser.password,
+          password: newUser.password
+
         });
       } else {
         res.status(400).json({ error: 'Invalid data' });
