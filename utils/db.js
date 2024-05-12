@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 import pkg from 'mongodb';
+import sha1 from 'sha1';
+
 const { MongoClient } = pkg;
 
 class DBClient {
-  constructor () {
+  constructor() {
     this.host = process.env.DB_HOST || 'localhost';
     this.port = process.env.DB_PORT || 27017;
     this.database = process.env.DB_DATABASE || 'files_manager';
@@ -21,11 +23,11 @@ class DBClient {
       });
   }
 
-  isAlive () {
+  isAlive() {
     return this.connected;
   }
 
-  async nbUsers () {
+  async nbUsers() {
     await this.client.connect();
     const users = await this.client
       .db(this.database)
@@ -34,13 +36,49 @@ class DBClient {
     return users;
   }
 
-  async nbFiles () {
+  async nbFiles() {
     await this.client.connect();
     const files = await this.client
       .db(this.database)
       .collection('files')
       .countDocuments();
     return files;
+  }
+
+  async createUser(username, password) {
+    const hashPassword = sha1(password);
+    await this.client.connect();
+    const user = await this.client
+      .db(this.database)
+      .collection('users')
+      .insertOne({ username, password: hashPassword });
+    return user;
+  }
+
+  async findUser(email) {
+    await this.client.connect();
+    const user = await this.client
+      .db(this.database)
+      .collection('users')
+      .findOne({ username: email });
+    return user;
+  }
+  async findUserById(id) {
+    await this.client.connect();
+    const user = await this.client
+      .db(this.database)
+      .collection('users')
+      .findOne({ _id: id });
+    return user;
+  }
+
+  async existingUser(email) {
+    const user = await this.findUser(email);
+    if (user) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
