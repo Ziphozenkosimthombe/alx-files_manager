@@ -60,7 +60,7 @@ class DBClient {
     const user = await this.client
       .db(this.database)
       .collection('users')
-      .findOne({ username: email });
+      .find(email);
     return user;
   }
 
@@ -69,7 +69,8 @@ class DBClient {
     const user = await this.client
       .db(this.database)
       .collection('users')
-      .findOne({ _id: id });
+      .find(_id)
+      .toArray();
     return user;
   }
 
