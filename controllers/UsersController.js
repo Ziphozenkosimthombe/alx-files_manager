@@ -1,7 +1,7 @@
 import dbClient from '../utils/db.js';
 
 class UsersController {
-  static async postNew(req, res) {
+  static async postNew (req, res) {
     try {
       const { email, password } = req.body;
 
@@ -24,7 +24,7 @@ class UsersController {
 
       return res.status(201).json({
         _id: newUser._id,
-        email: newUser.email,
+        email: newUser.email
       });
     } catch (err) {
       res.status(500).json({ error: err.message });
