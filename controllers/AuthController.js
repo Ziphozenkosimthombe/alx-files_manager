@@ -7,8 +7,9 @@ import { SHA1 } from '../utils/utils';
 class AuthController {
   static async getConnect(req, res) {
     try {
-      const { getAuthzHeader, getToken, decodeToken, getCredentials } =
-        GenerateAuthToken;
+      const {
+        getAuthzHeader, getToken, decodeToken, getCredentials,
+      } = GenerateAuthToken;
       const authzHeader = getAuthzHeader(req);
       if (!authzHeader) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -33,7 +34,7 @@ class AuthController {
       await redisClient.set(
         `auth_${accessToken}`,
         user._id.toString('utf8'),
-        60 * 60 * 24
+        60 * 60 * 24,
       );
       return res.json({ token: accessToken });
     } catch (err) {
