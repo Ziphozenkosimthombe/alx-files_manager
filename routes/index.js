@@ -1,7 +1,11 @@
 import express from 'express';
+
 import AppController from '../controllers/AppController.js';
 import UsersController from '../controllers/UsersController.js';
 import AuthController from '../controllers/AuthController.js';
+
+import AppController from '../controllers/AppController';
+import UsersController from '../controllers/UsersController';
 
 const router = express.Router();
 
