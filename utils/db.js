@@ -1,8 +1,8 @@
 import { MongoClient, ObjectID } from 'mongodb';
-import { SHA1 } from './utils.js';
+import { SHA1 } from './utils';
 
 class DBClient {
-  constructor () {
+  constructor() {
     this.host = (process.env.DB_HOST) ? process.env.DB_HOST : 'localhost';
     this.port = (process.env.DB_PORT) ? process.env.DB_PORT : 27017;
     this.database = (process.env.DB_DATABASE) ? process.env.DB_DATABASE : 'files_manager';
@@ -12,7 +12,7 @@ class DBClient {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
-      useCreateIndex: true
+      useCreateIndex: true,
     });
 
     this.client
@@ -25,27 +25,29 @@ class DBClient {
       });
   }
 
-  isAlive () {
+  isAlive() {
     return this.connected;
   }
 
-  async nbUsers () {
+  async nbUsers() {
     await this.client.connect();
-    return await this.client
+    const user = await this.client
       .db(this.database)
       .collection('users')
       .countDocuments();
+    return user;
   }
 
-  async nbFiles () {
+  async nbFiles() {
     await this.client.connect();
-    return await this.client
+    const user = await this.client
       .db(this.database)
       .collection('files')
       .countDocuments();
+    return user;
   }
 
-  async createUser (email, password) {
+  async createUser(email, password) {
     const hash = SHA1(password);
     await this.client.connect();
     const user = await this.client
@@ -55,7 +57,7 @@ class DBClient {
     return user;
   }
 
-  async getUser (email) {
+  async getUser(email) {
     await this.client.connect();
     const user = await this.client
       .db(this.database)
@@ -64,7 +66,7 @@ class DBClient {
     return user;
   }
 
-  async getUserById (id) {
+  async getUserById(id) {
     const _id = new ObjectID(id);
     await this.client.connect();
     const user = await this.client
@@ -74,13 +76,12 @@ class DBClient {
     return user;
   }
 
-  async userExists (email) {
+  async userExists(email) {
     const user = await this.getUser(email);
     if (user) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 }
 
