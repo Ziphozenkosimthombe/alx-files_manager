@@ -2,13 +2,19 @@ import { MongoClient } from 'mongodb';
 import { SHA1 } from './utils.js';
 
 class DBClient {
-  constructor() {
+  constructor () {
     this.host = process.env.DB_HOST || 'localhost';
     this.port = process.env.DB_PORT || 27017;
     this.database = process.env.DB_DATABASE || 'files_manager';
     this.connected = false;
     this.url = `mongodb://${this.host}:${this.port}/${this.database}`;
-    this.client = new MongoClient(this.url, { useUnifiedTopology: true });
+    this.client = new MongoClient(this.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true
+    });
+
     this.client
       .connect()
       .then(() => {
@@ -19,11 +25,11 @@ class DBClient {
       });
   }
 
-  isAlive() {
+  isAlive () {
     return this.connected;
   }
 
-  async nbUsers() {
+  async nbUsers () {
     await this.client.connect();
     const users = await this.client
       .db(this.database)
@@ -32,7 +38,7 @@ class DBClient {
     return users;
   }
 
-  async nbFiles() {
+  async nbFiles () {
     await this.client.connect();
     const files = await this.client
       .db(this.database)
@@ -41,7 +47,7 @@ class DBClient {
     return files;
   }
 
-  async createUser(email, password) {
+  async createUser (email, password) {
     const hash = SHA1(password);
     await this.client.connect();
     const user = await this.client
@@ -51,26 +57,26 @@ class DBClient {
     return user;
   }
 
-  async getUser(email) {
+  async getUser (email) {
     await this.client.connect();
     const user = await this.client
       .db(this.database)
       .collection('users')
       .findOne({ email });
-    return user
+    return user;
   }
 
-  async getUserById(id) {
+  async getUserById (id) {
     const _id = new mongodb.ObjectID(id);
     await this.client.connect();
     const user = await this.client
       .db(this.database)
       .collection('users')
       .findOne({ _id });
-    return user
+    return user;
   }
 
-  async userExists(email) {
+  async userExists (email) {
     const user = await this.getUser(email);
     if (user) {
       return true;
