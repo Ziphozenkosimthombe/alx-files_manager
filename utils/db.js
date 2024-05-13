@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { MongoClient } from 'mongodb';
 import { SHA1 } from './utils.js';
 
@@ -59,11 +57,7 @@ class DBClient {
       .db(this.database)
       .collection('users')
       .findOne({ email });
-    if (!user) {
-      return null;
-    } else {
-      return user;
-    }
+    return user
   }
 
   async getUserById(id) {
@@ -73,11 +67,7 @@ class DBClient {
       .db(this.database)
       .collection('users')
       .findOne({ _id });
-    if (!user) {
-      return null;
-    } else {
-      return user;
-    }
+    return user
   }
 
   async userExists(email) {
