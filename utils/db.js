@@ -31,20 +31,18 @@ class DBClient {
 
   async nbUsers () {
     await this.client.connect();
-    const users = await this.client
+    return await this.client
       .db(this.database)
       .collection('users')
       .countDocuments();
-    return users;
   }
 
   async nbFiles () {
     await this.client.connect();
-    const files = await this.client
+    return await this.client
       .db(this.database)
       .collection('files')
       .countDocuments();
-    return files;
   }
 
   async createUser (email, password) {
