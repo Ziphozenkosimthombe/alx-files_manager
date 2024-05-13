@@ -1,7 +1,7 @@
-import dbClient from '../utils/db.js';
+import dbClient from '../utils/db';
 
 class UsersController {
-  static async postNew (req, res) {
+  static async postNew(req, res) {
     try {
       const { email, password } = req.body;
 
@@ -19,14 +19,14 @@ class UsersController {
         return res.status(400).json({ error: 'Already exist' });
       }
 
-      const newUser = await dbClient.createUser(email, password); 
+      const newUser = await dbClient.createUser(email, password);
 
       return res.status(201).json({
         _id: newUser._id,
-        email: newUser.email
+        email: newUser.email,
       });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: err.message });
     }
   }
 }
