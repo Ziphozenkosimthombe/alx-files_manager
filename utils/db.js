@@ -1,14 +1,14 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectID } from 'mongodb';
 import { SHA1 } from './utils.js';
 
 class DBClient {
   constructor () {
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || 27017;
-    this.database = process.env.DB_DATABASE || 'files_manager';
+    this.host = (process.env.DB_HOST) ? process.env.DB_HOST : 'localhost';
+    this.port = (process.env.DB_PORT) ? process.env.DB_PORT : 27017;
+    this.database = (process.env.DB_DATABASE) ? process.env.DB_DATABASE : 'files_manager';
+    this.url = `mongodb://${this.host}:${this.port}`;
     this.connected = false;
-    const url = `mongodb://${host}:${port}`;
-    this.client = new MongoClient(url, {
+    this.client = new MongoClient(this.url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
@@ -21,7 +21,7 @@ class DBClient {
         this.connected = true;
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.message);
       });
   }
 
@@ -65,7 +65,7 @@ class DBClient {
   }
 
   async getUserById (id) {
-    const _id = new mongodb.ObjectID(id);
+    const _id = new ObjectID(id);
     await this.client.connect();
     const user = await this.client
       .db(this.database)
