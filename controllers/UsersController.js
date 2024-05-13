@@ -20,7 +20,7 @@ class UsersController {
       if (newUser) {
         res.status(201).json({
           _id: newUser._id,
-          email: newUser.email
+          email: newUser.email, 
         });
       } else {
         res.status(500).json({ error: 'Error creating user' });
