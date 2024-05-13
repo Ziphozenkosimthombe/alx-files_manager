@@ -50,7 +50,7 @@ class DBClient {
       .db(this.database)
       .collection('users')
       .insertOne({ email, password: hash });
-    return user.ops[0];
+    return user;
   }
 
   async getUser(email) {
@@ -58,7 +58,7 @@ class DBClient {
     const user = await this.client
       .db(this.database)
       .collection('users')
-      .findOne({ email });
+      .findOne({ email }).exec();
     if (!user) {
       return null;
     } else {
@@ -72,7 +72,7 @@ class DBClient {
     const user = await this.client
       .db(this.database)
       .collection('users')
-      .findOne({ _id });
+      .findOne({ _id }).exec();
     if (!user) {
       return null;
     } else {
