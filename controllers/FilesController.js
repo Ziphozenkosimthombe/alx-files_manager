@@ -69,14 +69,16 @@ class FilesController {
           parentId: parentId || 0,
           isPublic,
         })
-        .then((result) => res.status(201).json({
-          id: result.insertedId,
-          userId: user._id,
-          name,
-          type,
-          isPublic,
-          parentId: parentId || 0,
-        }))
+        .then((result) =>
+          res.status(201).json({
+            id: result.insertedId,
+            userId: user._id,
+            name,
+            type,
+            isPublic,
+            parentId: parentId || 0,
+          })
+        )
         .catch((error) => {
           console.log(error);
         });
@@ -125,81 +127,67 @@ class FilesController {
     return null;
   }
 
-  static async getShow(req, res) {
-    try {
-      const user = await FilesController.getUser(req);
-      if (!user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-      const fileId = req.params.id;
-      const files = dbClient.db.collection('files');
-      const idObject = new ObjectID(fileId);
-      const file = await files.findOne({ _id: idObject, userId: user._id });
-      if (!file) {
-        return res.status(404).json({ error: 'Not found' });
-      }
-      return res.status(200).json(file);
-    } catch (err) {
-      return res.status(500).json({ error: err });
+  static async getShow(request, response) {
+    const user = await FilesController.getUser(request);
+    if (!user) {
+      return response.status(401).json({ error: 'Unauthorized' });
     }
+    const fileId = request.params.id;
+    const files = dbClient.db.collection('files');
+    const idObject = new ObjectID(fileId);
+    const file = await files.findOne({ _id: idObject, userId: user._id });
+    if (!file) {
+      return response.status(404).json({ error: 'Not found' });
+    }
+    return response.status(200).json(file);
   }
 
-  static async gryIndex(req, res) {
-    try {
-      const user = await FilesController.getUser(req);
-      if (!user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-      const { parentId, page } = req.query;
-      const pageNum = page || 0;
-      const files = dbClient.db.collection('files');
-      let query;
-      if (!parentId) {
-        query = {
-          userId: user._id,
-        };
-      } else {
-        query = {
-          userId: user._id,
-          parentId: ObjectID(parentId),
-        };
-      }
-      files
-        .aggregate([
-          { $match: query },
-          { $sort: { _id: -1 } },
-          {
-            $facet: {
-              metadata: [
-                {
-                  $count: 'total',
-                },
-                { $addFields: { page: parseInt(pageNum, 10) } },
-              ],
-              data: [{ $skip: 20 * parseInt(pageNum, 10) }, { $limit: 20 }],
-            },
-          },
-        ])
-        .toArray((err, result) => {
-          if (result) {
-            const final = result[0].data.map((file) => {
-              const tmpFile = {
-                ...file,
-                id: file._id,
-              };
-              delete tmpFile._id;
-              delete tmpFile.localPath;
-              return tmpFile;
-            });
-            return res.status(200).json(final);
-          }
-          console.log('Error occured');
-          return res.status(404).json({ error: 'Not found' });
-        });
-      return null;
-    } catch (err) {
-      return res.status(500).json({ error: err });
+  static async getIndex(request, response) {
+    const user = await FilesController.getUser(request);
+    if (!user) {
+      return response.status(401).json({ error: 'Unauthorized' });
     }
+    const { parentId, page } = request.query;
+    const pageNum = page || 0;
+    const files = dbClient.db.collection('files');
+    let query;
+    if (!parentId) {
+      query = { userId: user._id };
+    } else {
+      query = { userId: user._id, parentId: ObjectID(parentId) };
+    }
+    files
+      .aggregate([
+        { $match: query },
+        { $sort: { _id: -1 } },
+        {
+          $facet: {
+            metadata: [
+              { $count: 'total' },
+              { $addFields: { page: parseInt(pageNum, 10) } },
+            ],
+            data: [{ $skip: 20 * parseInt(pageNum, 10) }, { $limit: 20 }],
+          },
+        },
+      ])
+      .toArray((err, result) => {
+        if (result) {
+          const final = result[0].data.map((file) => {
+            const tmpFile = {
+              ...file,
+              id: file._id,
+            };
+            delete tmpFile._id;
+            delete tmpFile.localPath;
+            return tmpFile;
+          });
+          // console.log(final);
+          return response.status(200).json(final);
+        }
+        console.log('Error occured');
+        return response.status(404).json({ error: 'Not found' });
+      });
+    return null;
   }
 }
 
