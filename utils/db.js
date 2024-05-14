@@ -1,91 +1,43 @@
-import { MongoClient, ObjectID } from 'mongodb';
-import { SHA1 } from './utils';
+import { MongoClient } from 'mongodb';
+
+const HOST = process.env.DB_HOST || 'localhost';
+const PORT = process.env.DB_PORT || 27017;
+const DATABASE = process.env.DB_DATABASE || 'files_manager';
+
+const url = `mongodb://${HOST}:${PORT}`;
 
 class DBClient {
   constructor() {
-    this.host = process.env.DB_HOST ? process.env.DB_HOST : 'localhost';
-    this.port = process.env.DB_PORT ? process.env.DB_PORT : 27017;
-    this.database = process.env.DB_DATABASE
-      ? process.env.DB_DATABASE
-      : 'files_manager';
-    this.url = `mongodb://${this.host}:${this.port}`;
-    this.connected = false;
-    this.client = new MongoClient(this.url, {
-      useNewUrlParser: true,
+    this.client = new MongoClient(url, {
       useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
+      useNewUrlParser: true,
     });
-
     this.client
       .connect()
       .then(() => {
-        this.connected = true;
+        this.db = this.client.db(`${DATABASE}`);
       })
       .catch((err) => {
-        console.log(err.message);
+        console.log(err);
       });
   }
 
   isAlive() {
-    return this.connected;
+    return this.client.isConnected();
   }
 
   async nbUsers() {
-    await this.client.connect();
-    const user = await this.client
-      .db(this.database)
-      .collection('users')
-      .countDocuments();
-    return user;
+    const users = this.db.collection('users');
+    const usersNum = await users.countDocuments();
+    return usersNum;
   }
 
   async nbFiles() {
-    await this.client.connect();
-    const user = await this.client
-      .db(this.database)
-      .collection('files')
-      .countDocuments();
-    return user;
-  }
-
-  async createUser(email, password) {
-    const hash = SHA1(password);
-    await this.client.connect();
-    const user = await this.client
-      .db(this.database)
-      .collection('users')
-      .insertOne({ email, password: hash });
-    return user.ops[0];
-  }
-
-  async getUser(email) {
-    await this.client.connect();
-    const user = await this.client
-      .db(this.database)
-      .collection('users')
-      .findOne({ email });
-    return user;
-  }
-
-  async getUserById(id) {
-    const _id = new ObjectID(id);
-    await this.client.connect();
-    const user = await this.client
-      .db(this.database)
-      .collection('users')
-      .findOne({ _id });
-    return user;
-  }
-
-  async userExists(email) {
-    const user = await this.getUser(email);
-    if (user) {
-      return true;
-    }
-    return false;
+    const files = this.db.collection('files');
+    const filesNum = await files.countDocuments();
+    return filesNum;
   }
 }
 
 const dbClient = new DBClient();
-export default dbClient;
+module.exports = dbClient;
