@@ -9,11 +9,11 @@ const userQueue = new Queue('userQueue', 'redis://127.0.0.1:6379');
 class UsersController {
   static async postNew(req, res) {
     try {
-      const { email, passowrd } = req.body;
+      const { email, password } = req.body;
       if (!email) {
         res.status(400).json({ error: 'Missing email' });
       }
-      if (!passowrd) {
+      if (!password) {
         res.status(400).json({ error: 'Missing password' });
       }
 
@@ -24,14 +24,14 @@ class UsersController {
         res.status(400).json({ error: 'Already exist' });
       }
 
-      const hashedPassword = sha1(passowrd);
+      const hashedPassword = sha1(password);
       const result = await users.insertOne({
         email,
         password: hashedPassword,
       });
 
       res.status(201).json({ id: result.insertedId, email });
-      userQueue.add({ id: result.insertedId, email });
+      userQueue.add({ userId: result.insertedId });
       return;
     } catch (err) {
       res.status(500).json({ error: err });
@@ -45,13 +45,13 @@ class UsersController {
       const userId = await redisClient.get(key);
 
       if (!userId) {
-        res.status(400).json({ error: 'Unauthorized' });
+        res.status(401).json({ error: 'Unauthorized' });
       }
 
       const users = dbClient.db.collection('users');
       const user = await users.findOne({ _id: new ObjectID(userId) });
       if (!user) {
-        res.status(400).json({ error: 'Unauthorized' });
+        res.status(401).json({ error: 'Unauthorized' });
       }
       res.status(200).json({ id: userId, email: user.email });
       return;
