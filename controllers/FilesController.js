@@ -69,16 +69,14 @@ class FilesController {
           parentId: parentId || 0,
           isPublic,
         })
-        .then((result) =>
-          res.status(201).json({
-            id: result.insertedId,
-            userId: user._id,
-            name,
-            type,
-            isPublic,
-            parentId: parentId || 0,
-          })
-        )
+        .then((result) => res.status(201).json({
+          id: result.insertedId,
+          userId: user._id,
+          name,
+          type,
+          isPublic,
+          parentId: parentId || 0,
+        }))
         .catch((error) => {
           console.log(error);
         });
