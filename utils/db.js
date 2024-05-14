@@ -3,9 +3,11 @@ import { SHA1 } from './utils';
 
 class DBClient {
   constructor() {
-    this.host = (process.env.DB_HOST) ? process.env.DB_HOST : 'localhost';
-    this.port = (process.env.DB_PORT) ? process.env.DB_PORT : 27017;
-    this.database = (process.env.DB_DATABASE) ? process.env.DB_DATABASE : 'files_manager';
+    this.host = process.env.DB_HOST ? process.env.DB_HOST : 'localhost';
+    this.port = process.env.DB_PORT ? process.env.DB_PORT : 27017;
+    this.database = process.env.DB_DATABASE
+      ? process.env.DB_DATABASE
+      : 'files_manager';
     this.url = `mongodb://${this.host}:${this.port}`;
     this.connected = false;
     this.client = new MongoClient(this.url, {
@@ -54,7 +56,7 @@ class DBClient {
       .db(this.database)
       .collection('users')
       .insertOne({ email, password: hash });
-    return user;
+    return user.ops[0];
   }
 
   async getUser(email) {
