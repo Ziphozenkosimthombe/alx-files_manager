@@ -21,7 +21,6 @@ class UsersController {
       }
 
       const newUser = await dbClient.createUser(email, password);
-
       return res.status(201).json({
         _id: newUser._id,
         email: newUser.email,
@@ -34,21 +33,18 @@ class UsersController {
   static async getMe(req, res) {
     const token = req.headers['x-token'];
     if (!token) {
+      console.log('on token if statement');
       res.status(401).json({ error: 'Unauthorized' });
-      res.end();
-      return;
     }
     const id = await redisClient.get(`auth_${token}`);
     if (!id) {
+      console.log('on id if statement');
       res.status(401).json({ error: 'Unauthorized' });
-      res.end();
-      return;
     }
     const user = await dbClient.getUserById(id);
     if (!user) {
+      console.log('on users if statement');
       res.status(401).json({ error: 'Unauthorized' });
-      res.end();
-      return;
     }
     res.json({ id: user._id, email: user.email }).end();
   }
